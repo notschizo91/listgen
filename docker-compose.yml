@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  svg-extrusion-tool:
+    build: .
+    volumes:
+      # Mount local directories for input/output
+      - ./input:/app/input
+      - ./output:/app/output
+      - ./examples:/app/examples
+    environment:
+      - NODE_ENV=production
+    container_name: svg-extrusion-tool
+    # Keep container running for exec commands
+    command: tail -f /dev/null
