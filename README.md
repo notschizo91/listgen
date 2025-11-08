@@ -20,7 +20,27 @@ npm install
 
 ## Quick Start
 
-### 1. Extrude an SVG file
+### 🌐 Web Interface (Recommended)
+
+The easiest way to use the SVG Extrusion Tool is through the web interface:
+
+```bash
+npm install
+npm run server
+```
+
+Then open `http://localhost:3000` in your browser!
+
+**Features:**
+- 📤 Drag & drop SVG or image files
+- 🎛️ Real-time parameter adjustment (height, twist, scale, mode)
+- 👁️ Live preview for images
+- 📥 One-click STL download
+- 📊 Conversion counter
+
+### 💻 Command Line Interface
+
+#### 1. Extrude an SVG file
 
 ```bash
 npm run extrude -- examples/star.svg
@@ -28,7 +48,7 @@ npm run extrude -- examples/star.svg
 
 This creates `output/star.stl` with default settings (5mm height).
 
-### 2. Custom parameters
+#### 2. Custom parameters
 
 ```bash
 npm run extrude -- examples/gear.svg -h 10 -t 45 -s 2
@@ -38,7 +58,7 @@ npm run extrude -- examples/gear.svg -h 10 -t 45 -s 2
 - Twist: 45 degrees
 - Scale: 2x
 
-### 3. Convert an image to 3D
+#### 3. Convert an image to 3D
 
 ```bash
 npm run extrude -- image examples/logo.png -h 8
@@ -170,6 +190,12 @@ svg-extrusion-tool/
 │   ├── cli.js            # Command-line interface
 │   ├── svgTo3d.js        # SVG → 3D extrusion engine
 │   └── pngToSvg.js       # Image → SVG vectorization
+├── server/
+│   ├── app.js            # Express web server
+│   └── public/           # Web interface files
+│       ├── index.html    # Main UI
+│       ├── app.js        # Frontend JavaScript
+│       └── style.css     # Styling
 ├── examples/             # Example SVG files
 │   ├── star.svg          # Simple star shape
 │   ├── heart.svg         # Heart shape
@@ -177,9 +203,63 @@ svg-extrusion-tool/
 │   ├── gear.svg          # Gear with center hole
 │   └── circle-profile.svg # Profile for rotate mode
 ├── output/               # Generated STL files
+├── uploads/              # Temporary upload directory
+├── deploy-to-server.sh   # Automated deployment script
+├── Dockerfile            # Docker configuration
+├── docker-compose.yml    # Docker Compose setup
 ├── package.json
 └── README.md
 ```
+
+## Deployment
+
+### Quick Deploy to Server
+
+Use the automated deployment script:
+
+```bash
+# Copy to your server
+scp deploy-to-server.sh root@your-server:/tmp/
+
+# SSH and run
+ssh root@your-server
+chmod +x /tmp/deploy-to-server.sh
+/tmp/deploy-to-server.sh
+```
+
+This will:
+- Install Node.js if needed
+- Clone and install the app to `/opt/svg-extrusion-tool`
+- Start the web server with PM2
+- Configure firewall
+- Create global `svg-extrude` command
+
+### Update Deployed Server
+
+```bash
+cd /opt/svg-extrusion-tool
+git pull origin claude/integrate-vectorizer-011CUvm5GAhiYTY2nZYPL49R
+npm install --production
+pm2 restart svg-extrusion-tool
+```
+
+Or use the one-liner:
+
+```bash
+cd /opt/svg-extrusion-tool && git pull origin claude/integrate-vectorizer-011CUvm5GAhiYTY2nZYPL49R && npm install --production && pm2 restart svg-extrusion-tool
+```
+
+### PM2 Management
+
+```bash
+pm2 status                    # Check status
+pm2 logs svg-extrusion-tool   # View logs
+pm2 restart svg-extrusion-tool # Restart
+pm2 stop svg-extrusion-tool    # Stop
+pm2 start svg-extrusion-tool   # Start
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for more deployment options.
 
 ## Programmatic API
 

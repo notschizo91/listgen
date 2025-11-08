@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # SVG Extrusion Tool Deployment Script
-# Deploys the CLI tool to your server for command-line usage
+# Deploys the web server and CLI tool to your server
 
 set -e  # Exit on any error
 
@@ -20,8 +20,10 @@ fi
 INSTALL_DIR="/opt/svg-extrusion-tool"
 REPO_URL="https://github.com/notschizo91/listgen.git"
 BRANCH="claude/integrate-vectorizer-011CUvm5GAhiYTY2nZYPL49R"
+APP_PORT="3000"
 
 echo "📁 Installation directory: $INSTALL_DIR"
+echo "🔌 Port: $APP_PORT"
 echo ""
 
 # Check if directory already exists
@@ -67,7 +69,15 @@ echo "📦 Installing dependencies..."
 npm install --production
 
 # Create necessary directories
-mkdir -p output
+mkdir -p uploads output
+
+# Create .env file
+echo ""
+echo "⚙️  Creating environment configuration..."
+cat > .env << EOF
+PORT=$APP_PORT
+NODE_ENV=production
+EOF
 
 # Create global command symlink
 echo ""
@@ -80,6 +90,32 @@ EOF
 
 chmod +x /usr/local/bin/svg-extrude
 
+# Install PM2 globally if not present
+if ! command -v pm2 &> /dev/null; then
+  echo "📦 Installing PM2 process manager..."
+  npm install -g pm2
+fi
+
+# Stop existing process if running
+pm2 delete svg-extrusion-tool 2>/dev/null || true
+
+# Start application with PM2
+echo ""
+echo "🚀 Starting web server..."
+pm2 start server/app.js --name svg-extrusion-tool
+pm2 save
+
+# Setup PM2 to start on boot
+pm2 startup systemd -u root --hp /root
+echo ""
+
+# Configure firewall if ufw is installed
+if command -v ufw &> /dev/null; then
+  echo "🔥 Configuring firewall..."
+  ufw allow $APP_PORT/tcp
+  echo "✅ Firewall rule added for port $APP_PORT"
+fi
+
 # Get server IP
 SERVER_IP=$(curl -s ifconfig.me || hostname -I | awk '{print $1}')
 
@@ -89,20 +125,30 @@ echo "✅ Deployment Complete!"
 echo "========================================"
 echo ""
 echo "📍 Installation: $INSTALL_DIR"
-echo "🖥️  Server IP: $SERVER_IP"
+echo "🌐 Web URL: http://$SERVER_IP:$APP_PORT"
 echo ""
-echo "🔧 Usage:"
-echo "   svg-extrude examples/star.svg"
-echo "   svg-extrude examples/gear.svg -h 10 -t 45"
-echo "   svg-extrude image photo.png -h 8"
-echo "   svg-extrude batch \"*.svg\" -h 10"
-echo "   svg-extrude examples  # Show all examples"
+echo "🎯 Two Ways to Use:"
+echo ""
+echo "1️⃣  WEB INTERFACE (Recommended)"
+echo "   Open: http://$SERVER_IP:$APP_PORT"
+echo "   • Drag & drop SVG or images"
+echo "   • Adjust extrusion parameters"
+echo "   • Download STL files"
+echo ""
+echo "2️⃣  COMMAND LINE"
+echo "   svg-extrude examples/star.svg -h 10 -t 45"
+echo ""
+echo "🔧 Management Commands:"
+echo "   pm2 status                    - Check status"
+echo "   pm2 logs svg-extrusion-tool   - View logs"
+echo "   pm2 restart svg-extrusion-tool - Restart"
+echo "   pm2 stop svg-extrusion-tool    - Stop"
+echo ""
+echo "🔄 Update Command:"
+echo "   cd $INSTALL_DIR"
+echo "   git pull origin $BRANCH"
+echo "   npm install --production"
+echo "   pm2 restart svg-extrusion-tool"
 echo ""
 echo "📂 Files location: $INSTALL_DIR"
-echo "📤 Output files:   $INSTALL_DIR/output"
-echo ""
-echo "💡 To use from any directory:"
-echo "   1. Upload your SVG: scp myfile.svg user@$SERVER_IP:/tmp/"
-echo "   2. SSH in and run: svg-extrude /tmp/myfile.svg"
-echo "   3. Download result: scp user@$SERVER_IP:$INSTALL_DIR/output/myfile.stl ."
 echo ""

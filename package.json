@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "extrude": "node src/cli.js",
+    "server": "node server/app.js",
     "test": "node --test tests/*.test.js"
   },
   "keywords": [
@@ -24,7 +25,11 @@
     "@jscad/stl-serializer": "^2.1.13",
     "@neplex/vectorizer": "^0.0.5",
     "commander": "^11.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "glob": "^10.3.10",
+    "multer": "^1.4.5-lts.1",
     "sharp": "^0.33.0",
     "svg-path-parser": "^1.1.0"
   }

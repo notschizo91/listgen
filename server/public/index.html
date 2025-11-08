@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Extrusion Tool - 3D Printing</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main App -->
+    <div id="app" class="single-screen-layout">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="logo">
+                <img src="https://3dsidehustle.com/wp-content/uploads/2025/09/white-logo-no-bg-Photoroom-1-e1757443093174.png" alt="3D Side Hustle" class="logo-image">
+                <span class="logo-subtitle">SVG Extrusion Tool</span>
+            </div>
+            <div class="usage-counter">
+                <span class="counter-label">Total Conversions</span>
+                <span class="counter-value" id="counterValue">0</span>
+            </div>
+            <a id="downloadBtn" class="download-btn glow-hidden" download style="display: none; position: absolute; right: 3rem;">
+                <span class="download-icon">📥</span>
+                <span>Download STL</span>
+            </a>
+        </div>
+
+        <!-- Center Upload Area -->
+        <div class="center-content">
+            <div id="dropZone" class="drop-zone-center">
+                <svg class="upload-icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                <h2 class="drop-title">Drop SVG or Image Here</h2>
+                <p class="drop-subtitle">or click to browse</p>
+                <p class="drop-hint">Supports: SVG, PNG, JPG, GIF</p>
+                <input type="file" id="fileInput" accept="image/*,.svg" hidden>
+            </div>
+
+            <div id="preview" class="preview-center" style="display: none;">
+                <h3 class="preview-label">File Selected</h3>
+                <div id="fileInfo" class="file-info">
+                    <span id="fileName">No file selected</span>
+                </div>
+                <div class="preview-actions">
+                    <button id="removeFile" class="btn-remove">✕ Remove</button>
+                    <button id="convertBtn" class="btn-convert">Convert to STL</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Controls -->
+        <div class="bottom-controls">
+            <div class="slider-group">
+                <div class="slider-item">
+                    <label>
+                        <span class="slider-label">Extrusion Height</span>
+                        <span class="slider-value" id="heightValue">5mm</span>
+                    </label>
+                    <input type="range" id="height" min="1" max="30" value="5" step="1">
+                    <div class="slider-marks">
+                        <span>1mm</span>
+                        <span>15mm</span>
+                        <span>30mm</span>
+                    </div>
+                </div>
+
+                <div class="slider-item">
+                    <label>
+                        <span class="slider-label">Twist Angle</span>
+                        <span class="slider-value" id="twistValue">0°</span>
+                    </label>
+                    <input type="range" id="twist" min="-180" max="180" value="0" step="5">
+                    <div class="slider-marks">
+                        <span>-180°</span>
+                        <span>0°</span>
+                        <span>180°</span>
+                    </div>
+                </div>
+
+                <div class="slider-item">
+                    <label>
+                        <span class="slider-label">Scale</span>
+                        <span class="slider-value" id="scaleValue">1.0x</span>
+                    </label>
+                    <input type="range" id="scale" min="0.5" max="3" value="1" step="0.1">
+                    <div class="slider-marks">
+                        <span>0.5x</span>
+                        <span>1x</span>
+                        <span>3x</span>
+                    </div>
+                </div>
+
+                <div class="slider-item">
+                    <label>
+                        <span class="slider-label">Mode</span>
+                        <span class="slider-value" id="modeValue">Linear</span>
+                    </label>
+                    <div class="mode-selector">
+                        <button id="modeLinear" class="mode-btn active">Linear</button>
+                        <button id="modeRotate" class="mode-btn">Rotate (Lathe)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image-specific controls (hidden by default) -->
+            <div id="imageControls" class="slider-group" style="display: none;">
+                <div class="slider-item">
+                    <label>
+                        <span class="slider-label">Detail</span>
+                        <span class="slider-value" id="detailValue">Medium</span>
+                    </label>
+                    <input type="range" id="detail" min="1" max="10" value="5" step="1">
+                    <div class="slider-marks">
+                        <span>Low</span>
+                        <span>Med</span>
+                        <span>High</span>
+                    </div>
+                </div>
+
+                <div class="slider-item">
+                    <label>
+                        <span class="slider-label">Smoothness</span>
+                        <span class="slider-value" id="smoothnessValue">Medium</span>
+                    </label>
+                    <input type="range" id="smoothness" min="1" max="10" value="5" step="1">
+                    <div class="slider-marks">
+                        <span>Sharp</span>
+                        <span>Med</span>
+                        <span>Smooth</span>
+                    </div>
+                </div>
+
+                <div class="slider-item">
+                    <label>
+                        <span class="slider-label">Contrast</span>
+                        <span class="slider-value" id="contrastValue">Balanced</span>
+                    </label>
+                    <input type="range" id="contrast" min="1" max="10" value="5" step="1">
+                    <div class="slider-marks">
+                        <span>Dark</span>
+                        <span>Med</span>
+                        <span>Light</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading" class="loading-overlay" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner-container">
+                    <div class="spinner-large"></div>
+                    <div class="spinner-pulse"></div>
+                </div>
+                <h2 class="loading-title">Creating your 3D model...</h2>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="loadingStep" class="loading-step">
+                    <span class="step-icon">🔄</span>
+                    <span id="stepText">Processing...</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Success Overlay -->
+        <div id="successOverlay" class="success-overlay" style="display: none;">
+            <div class="success-content">
+                <div class="success-checkmark">
+                    <svg class="checkmark" viewBox="0 0 52 52">
+                        <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                </div>
+                <h2 class="success-title">STL Ready!</h2>
+                <p class="success-message">Click the download button in the top right</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
