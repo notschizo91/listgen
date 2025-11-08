@@ -1,0 +1,31 @@
+{
+  "name": "svg-extrusion-tool",
+  "version": "1.0.0",
+  "description": "Convert SVG files to extruded 3D STL models with advanced vectorization",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "extrude": "node src/cli.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "3d-printing",
+    "stl",
+    "svg",
+    "vectorization",
+    "extrusion",
+    "jscad",
+    "3d-modeling"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@jscad/modeling": "^2.12.0",
+    "@jscad/stl-serializer": "^2.1.13",
+    "@neplex/vectorizer": "^0.0.5",
+    "commander": "^11.0.0",
+    "glob": "^10.3.10",
+    "sharp": "^0.33.0",
+    "svg-path-parser": "^1.1.0"
+  }
+}

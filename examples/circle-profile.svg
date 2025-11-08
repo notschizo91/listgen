@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Profile shape for rotate extrusion (lathe) -->
+  <path d="M 110 50 L 140 60 L 150 80 L 150 120 L 140 140 L 110 150 L 110 50 Z"
+        fill="black" stroke="none"/>
+</svg>
